@@ -45,13 +45,12 @@ class FightIQModel:
         if "Winner" not in df.columns:
             raise ValueError("CSV must contain a 'Winner' column.")
         # Keep only fights with a decisive winner
-        df = df[df["Winner"].isin(["Red", "Blue"])].copy()
+        df = df[df["Winner"].isin(["Red", "Blue"])] .copy()
         y = (df["Winner"] == "Blue").astype(int)
         X = df.drop(columns=["Winner"]).select_dtypes(include=[np.number]).fillna(0)
         return X, y
 
-    def train(self, X: pd.DataFrame, y: pd.Series,
-              test_size: float = 0.2, random_state: int = 42) -> float:
+    def train(self, X: pd.DataFrame, y: pd.Series, test_size: float = 0.2, random_state: int = 42) -> float:
         """
         Train the logistic regression model and return the test accuracy.
 
@@ -60,36 +59,34 @@ class FightIQModel:
         X : pandas.DataFrame
             Numeric feature matrix.
         y : pandas.Series
-            Binary labels.
+            Binary label series.
         test_size : float, optional
-            Proportion of the dataset to include in the test split (default is 0.2).
+            Fraction of the data to reserve for testing, by default 0.2.
         random_state : int, optional
-            Random seed for reproducibility (default is 42).
+            Random seed for reproducibility, by default 42.
 
         Returns
         -------
         float
-            Accuracy of the model on the hold-out test set.
+            Accuracy of the model on the test set.
         """
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=random_state
-        )
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
         self.pipeline.fit(X_train, y_train)
         y_pred = self.pipeline.predict(X_test)
         return accuracy_score(y_test, y_pred)
 
-    def predict(self, X: pd.DataFrame) -> np.ndarray:
+    def predict(self, X: pd.DataFrame):
         """
         Predict fight outcomes for new data.
 
         Parameters
         ----------
         X : pandas.DataFrame
-            Numeric feature matrix for upcoming fights.
+            Numeric feature matrix.
 
         Returns
         -------
         numpy.ndarray
-            Array of binary predictions (1 for Blue win, 0 for Red win).
+            Array of predictions where 1 indicates a Blue win and 0 indicates a Red win.
         """
         return self.pipeline.predict(X)
